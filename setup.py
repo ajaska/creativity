@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="creativity",
-    version="0.0.1",
+    version="0.0.2",
     author="Arlan Jaska",
     author_email="akjaska@gmail.com",
     description="Quick inspiration",
