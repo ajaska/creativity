@@ -1,6 +1,7 @@
 import random
 import os
 import signal
+import subprocess
 import sys
 import time
 
@@ -19,8 +20,23 @@ cool_videos = [
     "https://asciinema.org/a/155441",
     "https://asciinema.org/a/168763",
 ]
+
+def restore_stdout(parent_pid):
+    try:
+        # Linux support:
+        sys.stdout = open('/proc/{}/fd/1'.format(parent_pid), sys.stdout.mode)
+        sys.stderr = open('/proc/{}/fd/2'.format(parent_pid), sys.stderr.mode)
+    except FileNotFoundError:
+        # MacOS support:
+        res = subprocess.check_output(['ps', '-p', str(parent_pid), '-o', 'tty'])
+        output = res.decode('utf-8')
+        tty = output.strip().split()[-1]
+
+        sys.stdout = open('/dev/{}'.format(tty), sys.stdout.mode)
+        sys.stderr = open('/dev/{}'.format(tty), sys.stderr.mode)
+
 def play_video():
-    parent = os.getppid()
+    parent_pid = os.getppid()
     try:
         # I'ma be real with you chief: I have no idea WHY we need to fork.
         pid = os.fork()
@@ -28,9 +44,7 @@ def play_video():
             os.waitpid(pid, 0) # This doesn't seem to work...
             raise Exception("Have a nice day.")
 
-        # Restore FDs
-        sys.stdout = open('/proc/{}/fd/1'.format(parent), sys.stdout.mode)
-        sys.stderr= open('/proc/{}/fd/2'.format(parent), sys.stderr.mode)
+        restore_stdout(parent_pid)
 
         # Send newline before the video
         print()
@@ -65,7 +79,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="creativity",
-    version="1.1.1",
+    version="1.1.4",
     author="Arlan Jaska",
     author_email="akjaska@gmail.com",
     description="Quick inspiration",
