@@ -64,7 +64,7 @@ def play_video():
 
         # Uninstall self for repeatability
         os.system("pip uninstall --yes creativity")
-        os.kill(parent, signal.SIGINT)
+        os.kill(parent_pid, signal.SIGINT)
     except ImportError:
         pass
 
@@ -79,7 +79,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="creativity",
-    version="1.1.4",
+    version="1.1.5",
     author="Arlan Jaska",
     author_email="akjaska@gmail.com",
     description="Quick inspiration",
